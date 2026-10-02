@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Appearance,
@@ -24,17 +25,51 @@ export default function LoginScreen() {
   const theme = useTheme();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const toggleTheme = () => {
     Appearance.setColorScheme(isDarkMode ? "light" : "dark");
   };
 
-  const handleLogin = () => {
-    // Aquí puedes agregar la lógica para autenticar al usuario
-    console.log("Intento de login con:", email, password);
+  const handleLogin = async () => {
+    if (!login || !password) {
+      setErrorMsg("Por favor ingrese su usuario y contraseña.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      // Configurado el endpoint sugerido por el usuario
+      const response = await fetch("http://localhost:3001/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          login: login,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.statusCode === 200) {
+        router.replace("/dashboard");
+      } else {
+        setErrorMsg(data.message || "Usuario o clave incorrecta. Por favor verifique e intente nuevamente.");
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMsg("Error al conectar con el servidor. Por favor verifique su conexión.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,14 +98,13 @@ export default function LoginScreen() {
 
             <View style={styles.formContainer}>
               <TextInput
-                label="Correo Electrónico"
-                value={email}
-                onChangeText={setEmail}
+                label="Usuario"
+                value={login}
+                onChangeText={setLogin}
                 mode="outlined"
-                keyboardType="email-address"
                 autoCapitalize="none"
                 style={styles.input}
-                left={<TextInput.Icon icon="email-outline" />}
+                left={<TextInput.Icon icon="account-outline" />}
               />
 
               <TextInput
@@ -95,11 +129,19 @@ export default function LoginScreen() {
                 </Button>
               </View>
 
+              {errorMsg ? (
+                <Text style={{ color: theme.colors.error, marginBottom: 16, textAlign: 'center' }}>
+                  {errorMsg}
+                </Text>
+              ) : null}
+
               <Button
                 mode="contained"
                 onPress={handleLogin}
                 style={styles.loginButton}
                 contentStyle={styles.loginButtonContent}
+                loading={loading}
+                disabled={loading}
               >
                 Iniciar Sesión
               </Button>
