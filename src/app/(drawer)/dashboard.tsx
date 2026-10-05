@@ -1,4 +1,5 @@
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
+
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { Appbar, Card, Menu, Text, Title, useTheme } from "react-native-paper";
@@ -7,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function DashboardScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const theme = useTheme();
+  const navigation = useNavigation();
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
@@ -35,17 +37,13 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['right', 'left', 'bottom']}>
       <Appbar.Header elevated>
+        <Appbar.Action icon="menu" onPress={() => (navigation as any).openDrawer()} />
         <Appbar.Content title="Dashboard" />
         <Menu
           visible={menuVisible}
           onDismiss={closeMenu}
           anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}
         >
-          <Menu.Item 
-            onPress={() => { closeMenu(); }} 
-            title="Gestión de usuarios" 
-            leadingIcon="account-group" 
-          />
           <Menu.Item 
             onPress={() => { closeMenu(); handleLogout(); }} 
             title="Cerrar Sesión" 

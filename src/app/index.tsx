@@ -45,8 +45,9 @@ export default function LoginScreen() {
     setErrorMsg("");
 
     try {
-      // Configurado el endpoint sugerido por el usuario
-      const response = await fetch("http://localhost:3001/login", {
+      // En Android (emulador), 'localhost' se refiere al propio dispositivo, por lo que usamos '10.0.2.2'
+      const apiUrl = Platform.OS === 'android' ? 'http://192.168.100.8:3001/login' : 'http://localhost:3001/login';
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
