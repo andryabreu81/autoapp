@@ -38,6 +38,8 @@ export default function RegisterScreen() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -52,6 +54,9 @@ export default function RegisterScreen() {
   const hasAptoError = aptoNumber.length > 0 && !numbersOnlyRegex.test(aptoNumber);
   const hasFloorError = floor.length > 0 && !numbersOnlyRegex.test(floor);
   const hasLeaderError = leader.length > 0 && !strictLettersRegex.test(leader);
+  
+  const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
+  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
   const showMessage = (msg: string, isError = true) => {
     setSnackbarMessage(msg);
@@ -60,12 +65,12 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    if (!name || !lastname || !email || !identificationId || !phoneNumber || !aptoNumber || !floor || !leader || !login || !password) {
+    if (!name || !lastname || !email || !identificationId || !phoneNumber || !aptoNumber || !floor || !leader || !login || !password || !confirmPassword) {
       showMessage("Por favor, complete todos los campos.");
       return;
     }
 
-    if (hasNameError || hasLastnameError || hasIdentificationError || hasPhoneNumberError || hasEmailError || hasAptoError || hasFloorError || hasLeaderError) {
+    if (hasNameError || hasLastnameError || hasIdentificationError || hasPhoneNumberError || hasEmailError || hasAptoError || hasFloorError || hasLeaderError || passwordsMismatch) {
       showMessage("Por favor, corrija los errores en el formulario.");
       return;
     }
@@ -259,6 +264,31 @@ export default function RegisterScreen() {
                     />
                   }
                 />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Confirmar Contraseña"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  mode="outlined"
+                  secureTextEntry={!showConfirmPassword}
+                  style={styles.input}
+                  error={passwordsMismatch}
+                  left={<TextInput.Icon icon="lock-check-outline" />}
+                  right={
+                    <TextInput.Icon
+                      icon={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    />
+                  }
+                />
+                <HelperText type="error" visible={passwordsMismatch}>
+                  Las contraseñas no coinciden.
+                </HelperText>
+                <HelperText type="info" visible={passwordsMatch} style={{ color: theme.colors.primary }}>
+                  ¡Las contraseñas coinciden!
+                </HelperText>
               </View>
 
               <Button
