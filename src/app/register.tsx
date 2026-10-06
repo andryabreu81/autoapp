@@ -12,11 +12,17 @@ import {
 import {
   Appbar,
   Button,
+  HelperText,
   Snackbar,
   TextInput,
   useTheme,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const lettersOnlyRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+const numbersOnlyRegex = /^\d+$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const strictLettersRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/;
 
 export default function RegisterScreen() {
   const theme = useTheme();
@@ -38,6 +44,15 @@ export default function RegisterScreen() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarColor, setSnackbarColor] = useState(theme.colors.error);
 
+  const hasNameError = name.length > 0 && !lettersOnlyRegex.test(name);
+  const hasLastnameError = lastname.length > 0 && !lettersOnlyRegex.test(lastname);
+  const hasIdentificationError = identificationId.length > 0 && !numbersOnlyRegex.test(identificationId);
+  const hasPhoneNumberError = phoneNumber.length > 0 && !numbersOnlyRegex.test(phoneNumber);
+  const hasEmailError = email.length > 0 && !emailRegex.test(email);
+  const hasAptoError = aptoNumber.length > 0 && !numbersOnlyRegex.test(aptoNumber);
+  const hasFloorError = floor.length > 0 && !numbersOnlyRegex.test(floor);
+  const hasLeaderError = leader.length > 0 && !strictLettersRegex.test(leader);
+
   const showMessage = (msg: string, isError = true) => {
     setSnackbarMessage(msg);
     setSnackbarColor(isError ? theme.colors.error : theme.colors.primary);
@@ -47,6 +62,11 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     if (!name || !lastname || !email || !identificationId || !phoneNumber || !aptoNumber || !floor || !leader || !login || !password) {
       showMessage("Por favor, complete todos los campos.");
+      return;
+    }
+
+    if (hasNameError || hasLastnameError || hasIdentificationError || hasPhoneNumberError || hasEmailError || hasAptoError || hasFloorError || hasLeaderError) {
+      showMessage("Por favor, corrija los errores en el formulario.");
       return;
     }
 
@@ -109,94 +129,137 @@ export default function RegisterScreen() {
           <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
 
             <View style={styles.formContainer}>
-              <TextInput
-                label="Nombre"
-                value={name}
-                onChangeText={setName}
-                mode="outlined"
-                style={styles.input}
-              />
-              <TextInput
-                label="Apellido"
-                value={lastname}
-                onChangeText={setLastname}
-                mode="outlined"
-                style={styles.input}
-              />
-              <TextInput
-                label="Cédula de Identidad"
-                value={identificationId}
-                onChangeText={setIdentificationId}
-                keyboardType="numeric"
-                mode="outlined"
-                style={styles.input}
-              />
-              <TextInput
-                label="Teléfono"
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                keyboardType="phone-pad"
-                mode="outlined"
-                style={styles.input}
-              />
-              <TextInput
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                mode="outlined"
-                style={styles.input}
-              />
-              <View style={styles.row}>
+              <View style={styles.inputWrapper}>
                 <TextInput
-                  label="Número de Apto"
-                  value={aptoNumber}
-                  onChangeText={setAptoNumber}
+                  label="Nombre"
+                  value={name}
+                  onChangeText={setName}
                   mode="outlined"
-                  style={[styles.input, { flex: 1, marginRight: 8 }]}
+                  style={styles.input}
+                  error={hasNameError}
                 />
+                <HelperText type="error" visible={hasNameError}>Solo debe contener letras.</HelperText>
+              </View>
+
+              <View style={styles.inputWrapper}>
                 <TextInput
-                  label="Piso"
-                  value={floor}
-                  onChangeText={setFloor}
+                  label="Apellido"
+                  value={lastname}
+                  onChangeText={setLastname}
+                  mode="outlined"
+                  style={styles.input}
+                  error={hasLastnameError}
+                />
+                <HelperText type="error" visible={hasLastnameError}>Solo debe contener letras.</HelperText>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Cédula de Identidad"
+                  value={identificationId}
+                  onChangeText={setIdentificationId}
                   keyboardType="numeric"
                   mode="outlined"
-                  style={[styles.input, { flex: 1, marginLeft: 8 }]}
+                  style={styles.input}
+                  error={hasIdentificationError}
+                />
+                <HelperText type="error" visible={hasIdentificationError}>Solo debe contener números.</HelperText>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Teléfono"
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  keyboardType="phone-pad"
+                  mode="outlined"
+                  style={styles.input}
+                  error={hasPhoneNumberError}
+                />
+                <HelperText type="error" visible={hasPhoneNumberError}>Solo debe contener números.</HelperText>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  mode="outlined"
+                  style={styles.input}
+                  error={hasEmailError}
+                />
+                <HelperText type="error" visible={hasEmailError}>Correo electrónico inválido.</HelperText>
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputWrapper, { flex: 1, marginRight: 8 }]}>
+                  <TextInput
+                    label="Número de Apto"
+                    value={aptoNumber}
+                    onChangeText={setAptoNumber}
+                    mode="outlined"
+                    style={styles.input}
+                    error={hasAptoError}
+                  />
+                  <HelperText type="error" visible={hasAptoError}>Solo números.</HelperText>
+                </View>
+                <View style={[styles.inputWrapper, { flex: 1, marginLeft: 8 }]}>
+                  <TextInput
+                    label="Piso"
+                    value={floor}
+                    onChangeText={setFloor}
+                    keyboardType="numeric"
+                    mode="outlined"
+                    style={styles.input}
+                    error={hasFloorError}
+                  />
+                  <HelperText type="error" visible={hasFloorError}>Solo números.</HelperText>
+                </View>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Letra (e.g. G)"
+                  value={leader}
+                  onChangeText={setLeader}
+                  mode="outlined"
+                  style={styles.input}
+                  error={hasLeaderError}
+                />
+                <HelperText type="error" visible={hasLeaderError}>Solo debe contener letras.</HelperText>
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Usuario (Login)"
+                  value={login}
+                  onChangeText={setLogin}
+                  autoCapitalize="none"
+                  mode="outlined"
+                  style={styles.input}
+                  left={<TextInput.Icon icon="account-outline" />}
                 />
               </View>
-              <TextInput
-                label="Letra (e.g. G)"
-                value={leader}
-                onChangeText={setLeader}
-                mode="outlined"
-                style={styles.input}
-              />
 
-              <TextInput
-                label="Usuario (Login)"
-                value={login}
-                onChangeText={setLogin}
-                autoCapitalize="none"
-                mode="outlined"
-                style={styles.input}
-                left={<TextInput.Icon icon="account-outline" />}
-              />
-              <TextInput
-                label="Contraseña"
-                value={password}
-                onChangeText={setPassword}
-                mode="outlined"
-                secureTextEntry={!showPassword}
-                style={styles.input}
-                left={<TextInput.Icon icon="lock-outline" />}
-                right={
-                  <TextInput.Icon
-                    icon={showPassword ? "eye-off-outline" : "eye-outline"}
-                    onPress={() => setShowPassword(!showPassword)}
-                  />
-                }
-              />
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="Contraseña"
+                  value={password}
+                  onChangeText={setPassword}
+                  mode="outlined"
+                  secureTextEntry={!showPassword}
+                  style={styles.input}
+                  left={<TextInput.Icon icon="lock-outline" />}
+                  right={
+                    <TextInput.Icon
+                      icon={showPassword ? "eye-off-outline" : "eye-outline"}
+                      onPress={() => setShowPassword(!showPassword)}
+                    />
+                  }
+                />
+              </View>
 
               <Button
                 mode="contained"
@@ -235,8 +298,10 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
   },
+  inputWrapper: {
+    marginBottom: 4,
+  },
   input: {
-    marginBottom: 16,
     backgroundColor: "transparent",
   },
   row: {
