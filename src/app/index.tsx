@@ -150,7 +150,7 @@ export default function LoginScreen() {
 
             <View style={styles.footerContainer}>
               <Text variant="bodyMedium">¿No tienes una cuenta? </Text>
-              <Button mode="text" onPress={() => { }} compact>
+              <Button mode="text" onPress={() => router.push("/register")} compact>
                 Regístrate
               </Button>
             </View>
