@@ -20,6 +20,7 @@ import {
   useTheme,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const theme = useTheme();
@@ -61,6 +62,12 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (response.ok && data.statusCode === 200) {
+        const user = data.data || data.user || data;
+        const roleId = Array.isArray(user) ? user[0]?.roleId : user?.roleId;
+        
+        if (roleId !== undefined) {
+          await AsyncStorage.setItem('roleId', String(roleId));
+        }
         router.replace("/dashboard");
       } else {
         setErrorMsg(data.message || "Usuario o clave incorrecta. Por favor verifique e intente nuevamente.");
