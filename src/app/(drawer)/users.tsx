@@ -32,7 +32,7 @@ const initialForm = {
 };
 
 const renderDetailValue = (key: string, value: any) => {
-  if (key === 'role_id') {
+  if (key === 'role_id' || key === 'roleId') {
     if (value === 2 || value === '2') return 'Administrador';
     if (value === 3 || value === '3') return 'Propietario';
   }
